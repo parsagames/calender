@@ -16,8 +16,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: '22'
 
       - name: Set up Java 17
         uses: actions/setup-java@v4
@@ -29,7 +28,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Install Pillow
-        run: pip install pillow
+        run: pip install pillow --break-system-packages
 
       - name: Install dependencies
         run: npm install
@@ -37,7 +36,7 @@ jobs:
       - name: Add Android platform
         run: npx cap add android
 
-      - name: Copy and resize icons
+      - name: Copy icon to Android resources
         run: |
           python3 -c "
           from PIL import Image
@@ -57,13 +56,13 @@ jobs:
             r.save(f'{path}/ic_launcher.png', 'PNG')
             r.save(f'{path}/ic_launcher_round.png', 'PNG')
             r.save(f'{path}/ic_launcher_foreground.png', 'PNG')
-          print('Icons done')
+          print('Icons copied!')
           "
 
       - name: Sync Capacitor
         run: npx cap sync android
 
-      - name: Set app label
+      - name: Set app label in strings.xml
         run: |
           sed -i 's|<string name="app_name">.*</string>|<string name="app_name">تقویم شیعه امیرالمومنین</string>|' \
             android/app/src/main/res/values/strings.xml || true
@@ -91,6 +90,6 @@ jobs:
           name: "تقویم شیعه امیرالمومنین - نسخه ${{ github.run_number }}"
           body: "نسخه تست"
           files: android/app/build/outputs/apk/debug/app-debug.apk
-          generate_release_notes: false
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
