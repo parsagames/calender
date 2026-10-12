@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>پنل مدیریت</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap">
+  <style>
+    :root {
+      --bg: #181820;
+      --card: #22222e;
+      --card-2: #2a2a38;
+      --gold-soft: #cda24d;
+      --text: #e8e4d8;
+      --text-dim: #8a8490;
+      --danger: #e05252;
+      --line: rgba(255,255,255,0.08);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Vazirmatn, Tahoma, sans-serif;
+      direction: rtl;
+    }
+    .page-wrap {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 32px 16px 48px;
+    }
+    .page-title {
+      text-align: center;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--gold-soft);
+      margin-bottom: 28px;
+    }
+
+    /* --- Password screen --- */
+    #passScreen {
+      background: var(--card);
+      border-radius: 18px;
+      padding: 32px 24px;
+      border: 1px solid var(--line);
+      text-align: center;
+    }
+    #passScreen h2 {
+      margin: 0 0 20px;
+      font-size: 17px;
+      color: var(--text-dim);
+    }
+    .pass-row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    .pass-input {
+      flex: 1;
+      max-width: 260px;
+      padding: 11px 14px;
+      background: var(--card-2);
+      border: 1.5px solid var(--line);
+      border-radius: 12px;
+      color: var(--text);
+      font-family: Vazirmatn, Tahoma, sans-serif;
+      font-size: 15px;
+      outline: none;
+      direction: ltr;
+      text-align: center;
+    }
+    .pass-input:focus { border-color: var(--gold-soft); }
+    .pass-btn {
+      padding: 11px 20px;
+      background: var(--gold-soft);
+      color: #181820;
+      border: none;
+      border-radius: 12px;
+      font-family: Vazirmatn, Tahoma, sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .pass-btn:hover { opacity: 0.88; }
+    #passErr {
+      color: var(--danger);
+      font-size: 13px;
+      margin-top: 10px;
+      min-height: 18px;
+    }
+
+    /* --- Admin panel --- */
+    #adminPanel { display: none; }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 10px 0;
+      background: var(--card-2);
+      color: var(--text-dim);
+      border: 1.5px solid var(--line);
+      border-radius: 12px;
+      font-family: Vazirmatn, Tahoma, sans-serif;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .tab-btn.active {
+      background: var(--gold-soft);
+      color: #181820;
+      border-color: var(--gold-soft);
+      font-weight: 700;
+    }
+
+    /* --- Meeting items --- */
+    .section { display: none; }
+    .section.active { display: block; }
+
+    .meeting-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+    }
+    .meeting-item img {
+      width: 52px;
+      height: 52px;
+      object-fit: cover;
+      border-radius: 10px;
+      background: var(--card-2);
+      flex-shrink: 0;
+    }
+    .meeting-item-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+    .meeting-item-info span { font-size: 12px; }
+    .del-btn {
+      padding: 7px 12px;
+      background: rgba(224,82,82,0.12);
+      color: var(--danger);
+      border: 1px solid rgba(224,82,82,0.25);
+      border-radius: 10px;
+      font-family: Vazirmatn, Tahoma, sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .del-btn:hover { background: rgba(224,82,82,0.22); }
+    .empty-msg {
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 13px;
+      padding: 24px 0;
+    }
+    .loading-msg {
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 13px;
+      padding: 20px 0;
+    }
+
+    /* --- Heyat items --- */
+    .heyat-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+    }
+    .heyat-item img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      border-radius: 8px;
+      background: var(--card-2);
+      flex-shrink: 0;
+    }
+    .heyat-item-name {
+      flex: 1;
+      font-size: 14px;
+    }
+    .heyat-item-badge {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 3px;
+    }
+    .heyat-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .edit-btn {
+      padding: 7px 12px;
+      background: var(--card-2);
+      color: var(--text-dim);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      font-family: Vazirmatn, Tahoma, sans-serif;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .edit-btn:hover { background: var(--bg); }
+
+    /* --- Edit form --- */
+    #editForm {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      display: none;
+    }
+    #editForm.open { display: block; }
+    .form-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--gold-soft);
+      margin-bottom: 14px;
+    }
+    .form-label {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+    }
+    .form-input {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--card-2);
+      border: 1.5px solid var(--line);
+      border-radius: 12px;
+      color: var(--text);
+      font-family: Vazirmatn, Tahoma, sans-serif;
+      font-size: 14px;
+      outline: none;
+      margin-bottom: 12px;
+      direction: rtl;
+    }
+    .form-input:focus { border-color: var(--gold-soft); }
+    .logo-pick-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .logo-preview {
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: var(--card-2);
+      cursor: pointer;
+    }
+    .logo-pick-hint {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+    .form-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-primary {
+      flex: 1;
+      padding: 11px 0;
+      background: var(--gold-soft);
+      color: #181820;
+      border: none;
+      border-radius: 12px;
+      font-family: Vazirmatn, Tahoma, sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-secondary {
+      flex: 1;
+      padding: 11px 0;
+      background: var(--card-2);
+      color: var(--text-dim);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      font-family: Vazirmatn, Tahoma, sans-serif;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .btn-secondary:hover { background: var(--bg); }
+    .form-err {
+      color: var(--danger);
+      font-size: 12px;
+      min-height: 16px;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+  <div class="page-title">🔐 پنل مدیریت</div>
+
+  <!-- Password screen -->
+  <div id="passScreen">
+    <h2>رمز عبور را وارد کنید</h2>
+    <div class="pass-row">
+      <input class="pass-input" id="passInput" type="password" placeholder="••••••••••" autocomplete="off">
+      <button class="pass-btn" id="passBtn">ورود</button>
+    </div>
+    <div id="passErr"></div>
+  </div>
+
+  <!-- Admin panel -->
+  <div id="adminPanel">
+    <div class="tabs">
+      <button class="tab-btn active" id="tabMeetings" onclick="switchTab('meetings')">حذف جلسات</button>
+      <button class="tab-btn" id="tabHeyat" onclick="switchTab('heyat')">هیئت‌ها</button>
+    </div>
+
+    <!-- Meetings section -->
+    <div class="section active" id="secMeetings">
+      <div id="meetingsList"><div class="loading-msg">در حال بارگذاری...</div></div>
+    </div>
+
+    <!-- Heyat section -->
+    <div class="section" id="secHeyat">
+      <!-- Edit form -->
+      <div id="editForm">
+        <div class="form-title" id="editFormTitle">ویرایش هیئت</div>
+        <div class="form-label">لوگو</div>
+        <div class="logo-pick-wrap">
+          <img id="editLogoPreview" class="logo-preview" src="" alt="" title="کلیک برای تغییر لوگو">
+          <span class="logo-pick-hint">برای تغییر لوگو کلیک کنید</span>
+        </div>
+        <input type="file" id="editLogoInput" accept="image/*" style="display:none;">
+        <div class="form-label">نام هیئت</div>
+        <input class="form-input" id="editNameInput" type="text" dir="rtl" placeholder="نام هیئت">
+        <div class="form-err" id="editErr"></div>
+        <div class="form-actions">
+          <button class="btn-primary" id="editSaveBtn">ذخیره</button>
+          <button class="btn-secondary" id="editCancelBtn">لغو</button>
+        </div>
+      </div>
+      <div id="heyatList"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // --- Constants ---
+  const ADMIN_PASS = '110118128';
+
+  const GIST_ID    = 'efcc9d951f84ea23138b5d23854edfc3';
+  const GIST_TOKEN = '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';
+  const GIST_FILE  = 'meetings.json';
+  const GIST_URL   = 'https://api.github.com/gists/' + GIST_ID;
+  const GIST_HDR   = { 'Authorization': 'token ' + GIST_TOKEN, 'Content-Type': 'application/json' };
+
+  const HEYAT_STORE_KEY    = 'custom_heyat_places';
+  const DELETED_BUILTIN_KEY = 'deleted_builtin_heyats';
+  const EDITED_HEYAT_KEY   = 'edited_heyat_data';
+
+  const BUILTIN_HEYATS = [
+    { name: 'هیئت جنت العباس نجف‌آباد',    lat: 32.615575, lng: 51.361024 },
+    { name: 'هیئت محبان الحسن نجف‌آباد',   lat: 32.61958179640652, lng: 51.363651904870125 },
+    { name: 'هیئت زینبیون نجف‌آباد',       lat: 32.615716, lng: 51.366621 }
+  ];
+
+  // Default heyat logo (simple SVG placeholder)
+  const DEFAULT_LOGO = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44'%3E%3Crect width='44' height='44' rx='10' fill='%232a2a38'/%3E%3Ctext x='22' y='28' text-anchor='middle' fill='%23cda24d' font-size='20'%3E🕌%3C/text%3E%3C/svg%3E";
+
+  // --- Password ---
+  const passInput = document.getElementById('passInput');
+  const passBtn   = document.getElementById('passBtn');
+  const passErr   = document.getElementById('passErr');
+
+  function tryUnlock() {
+    if (passInput.value === ADMIN_PASS) {
+      document.getElementById('passScreen').style.display = 'none';
+      document.getElementById('adminPanel').style.display = 'block';
+      loadMeetings();
+    } else {
+      passErr.textContent = 'رمز اشتباه است';
+      passInput.value = '';
+      passInput.focus();
+    }
+  }
+  passBtn.addEventListener('click', tryUnlock);
+  passInput.addEventListener('keydown', function(e){ if(e.key === 'Enter') tryUnlock(); });
+  passInput.focus();
+
+  // --- Tabs ---
+  function switchTab(tab) {
+    document.getElementById('tabMeetings').classList.toggle('active', tab === 'meetings');
+    document.getElementById('tabHeyat').classList.toggle('active', tab === 'heyat');
+    document.getElementById('secMeetings').classList.toggle('active', tab === 'meetings');
+    document.getElementById('secHeyat').classList.toggle('active', tab === 'heyat');
+    if (tab === 'heyat') renderHeyatList();
+  }
+
+  // --- Meetings (Gist) ---
+  function fetchMeetings() {
+    return fetch(GIST_URL + '?t=' + Date.now(), { headers: GIST_HDR })
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        var content = j.files && j.files[GIST_FILE] && j.files[GIST_FILE].content;
+        if(!content) return [];
+        try{ return JSON.parse(content).meetings || []; } catch(e){ return []; }
+      });
+  }
+
+  function writeMeetings(list) {
+    var files = {};
+    files[GIST_FILE] = { content: JSON.stringify({ meetings: list }) };
+    return fetch(GIST_URL, {
+      method: 'PATCH',
+      headers: GIST_HDR,
+      body: JSON.stringify({ files: files })
+    }).then(function(r){ return r.json(); });
+  }
+
+  var meetingsCache = [];
+
+  function loadMeetings() {
+    document.getElementById('meetingsList').innerHTML = '<div class="loading-msg">در حال بارگذاری...</div>';
+    fetchMeetings().then(function(list){
+      meetingsCache = list;
+      renderMeetingsList();
+    }).catch(function(){
+      document.getElementById('meetingsList').innerHTML = '<div class="empty-msg">خطا در دریافت جلسات</div>';
+    });
+  }
+
+  function renderMeetingsList() {
+    var el = document.getElementById('meetingsList');
+    if (!meetingsCache || meetingsCache.length === 0) {
+      el.innerHTML = '<div class="empty-msg">جلسه‌ای وجود ندارد</div>';
+      return;
+    }
+    el.innerHTML = '';
+    meetingsCache.forEach(function(m) {
+      var timeStr = '';
+      if (m.expiresAt) {
+        try {
+          timeStr = new Date(m.expiresAt - (m.days||1)*86400000).toLocaleString('fa-IR', {
+            hour:'2-digit', minute:'2-digit', month:'short', day:'numeric'
+          });
+        } catch(e) {}
+      }
+      var item = document.createElement('div');
+      item.className = 'meeting-item';
+      item.innerHTML =
+        '<img src="' + (m.poster || '') + '" onerror="this.style.visibility=\'hidden\'">' +
+        '<div class="meeting-item-info">' +
+          '<span>📍 ' + (m.lat ? m.lat.toFixed(4) : '?') + ', ' + (m.lng ? m.lng.toFixed(4) : '?') + '</span>' +
+          (timeStr ? '<span>⏱ ' + timeStr + '</span>' : '') +
+        '</div>' +
+        '<button class="del-btn" data-id="' + m.id + '">🗑 حذف</button>';
+      el.appendChild(item);
+    });
+    el.querySelectorAll('.del-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var id = btn.getAttribute('data-id');
+        if(!confirm('این جلسه حذف شود؟')) return;
+        btn.disabled = true;
+        btn.textContent = '...';
+        var newList = meetingsCache.filter(function(m){ return m.id !== id; });
+        writeMeetings(newList).then(function(){
+          meetingsCache = newList;
+          renderMeetingsList();
+        }).catch(function(){
+          alert('خطا در حذف جلسه');
+          btn.disabled = false;
+          btn.textContent = '🗑 حذف';
+        });
+      });
+    });
+  }
+
+  // --- Heyats (localStorage) ---
+  var heyatStore = {
+    loadCustom: function(){ try{ return JSON.parse(localStorage.getItem(HEYAT_STORE_KEY)||'[]'); }catch(e){ return []; } },
+    saveCustom: function(list){ try{ localStorage.setItem(HEYAT_STORE_KEY, JSON.stringify(list)); }catch(e){} },
+    loadDeleted: function(){ try{ return JSON.parse(localStorage.getItem(DELETED_BUILTIN_KEY)||'[]'); }catch(e){ return []; } },
+    saveDeleted: function(list){ try{ localStorage.setItem(DELETED_BUILTIN_KEY, JSON.stringify(list)); }catch(e){} },
+    loadEdits: function(){ try{ return JSON.parse(localStorage.getItem(EDITED_HEYAT_KEY)||'{}'); }catch(e){ return {}; } },
+    saveEdits: function(edits){ try{ localStorage.setItem(EDITED_HEYAT_KEY, JSON.stringify(edits)); }catch(e){} }
+  };
+
+  function buildHeyatList() {
+    var deleted = heyatStore.loadDeleted();
+    var edits   = heyatStore.loadEdits();
+    var custom  = heyatStore.loadCustom();
+
+    var items = [];
+
+    BUILTIN_HEYATS.forEach(function(b){
+      var origName = b.name;
+      var isDeleted = deleted.indexOf(origName) !== -1;
+      var ed = edits[origName];
+      var displayName = ed ? ed.name : origName;
+      var logo = (ed && ed.logoUri) ? ed.logoUri : DEFAULT_LOGO;
+      items.push({ type:'builtin', origName:origName, name:displayName, logo:logo, deleted:isDeleted });
+    });
+
+    custom.forEach(function(c){
+      items.push({ type:'custom', id:c.id, name:c.name, logo:c.logoUri || DEFAULT_LOGO, deleted:false });
+    });
+
+    return items;
+  }
+
+  function renderHeyatList() {
+    closeEditForm();
+    var items = buildHeyatList();
+    var el = document.getElementById('heyatList');
+    if (items.length === 0) {
+      el.innerHTML = '<div class="empty-msg">هیئتی وجود ندارد</div>';
+      return;
+    }
+    el.innerHTML = '';
+    items.forEach(function(h, idx){
+      var item = document.createElement('div');
+      item.className = 'heyat-item';
+      if(h.deleted) item.style.opacity = '0.45';
+      item.innerHTML =
+        '<img src="' + h.logo + '" alt="" onerror="this.src=\'' + DEFAULT_LOGO + '\'">' +
+        '<div style="flex:1;">' +
+          '<div class="heyat-item-name">' + h.name + '</div>' +
+          '<div class="heyat-item-badge">' + (h.type==='custom' ? 'سفارشی' : 'پیش‌فرض') + (h.deleted ? ' — حذف شده' : '') + '</div>' +
+        '</div>' +
+        '<div class="heyat-actions">' +
+          (!h.deleted ? '<button class="edit-btn" data-idx="' + idx + '">✏️</button>' : '') +
+          (!h.deleted ? '<button class="del-btn" data-idx="' + idx + '">حذف</button>' : '<button class="edit-btn" data-idx="' + idx + '" data-restore="1">بازگردانی</button>') +
+        '</div>';
+      el.appendChild(item);
+    });
+
+    el.querySelectorAll('.edit-btn[data-restore]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var idx = parseInt(btn.getAttribute('data-idx'));
+        var h = items[idx];
+        if(h.type === 'builtin'){
+          var deleted = heyatStore.loadDeleted().filter(function(n){ return n !== h.origName; });
+          heyatStore.saveDeleted(deleted);
+          renderHeyatList();
+        }
+      });
+    });
+
+    el.querySelectorAll('.edit-btn:not([data-restore])').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var idx = parseInt(btn.getAttribute('data-idx'));
+        openEditForm(items[idx], idx);
+      });
+    });
+
+    el.querySelectorAll('.del-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var idx = parseInt(btn.getAttribute('data-idx'));
+        var h = items[idx];
+        if(!confirm('هیئت «' + h.name + '» حذف شود؟')) return;
+        if(h.type === 'builtin'){
+          var deleted = heyatStore.loadDeleted();
+          if(deleted.indexOf(h.origName) === -1){ deleted.push(h.origName); }
+          heyatStore.saveDeleted(deleted);
+        } else {
+          var custom = heyatStore.loadCustom().filter(function(c){ return c.id !== h.id; });
+          heyatStore.saveCustom(custom);
+        }
+        renderHeyatList();
+      });
+    });
+  }
+
+  // --- Edit form ---
+  var editingItem = null;
+  var editNewLogoDataUrl = null;
+
+  function openEditForm(h, idx) {
+    editingItem = h;
+    editNewLogoDataUrl = null;
+    document.getElementById('editFormTitle').textContent = 'ویرایش: ' + h.name;
+    document.getElementById('editNameInput').value = h.name;
+    document.getElementById('editLogoPreview').src = h.logo;
+    document.getElementById('editErr').textContent = '';
+    document.getElementById('editForm').classList.add('open');
+  }
+
+  function closeEditForm() {
+    editingItem = null;
+    editNewLogoDataUrl = null;
+    document.getElementById('editForm').classList.remove('open');
+    document.getElementById('editLogoInput').value = '';
+  }
+
+  document.getElementById('editCancelBtn').addEventListener('click', closeEditForm);
+
+  document.getElementById('editLogoPreview').addEventListener('click', function(){
+    document.getElementById('editLogoInput').click();
+  });
+
+  document.getElementById('editLogoInput').addEventListener('change', function(){
+    var file = this.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e){
+      editNewLogoDataUrl = e.target.result;
+      document.getElementById('editLogoPreview').src = editNewLogoDataUrl;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById('editSaveBtn').addEventListener('click', function(){
+    if(!editingItem) return;
+    var h = editingItem;
+    var newName = document.getElementById('editNameInput').value.trim();
+    if(!newName){
+      document.getElementById('editErr').textContent = 'نام هیئت نمی‌تواند خالی باشد';
+      return;
+    }
+    var newLogo = editNewLogoDataUrl || h.logo;
+
+    if(h.type === 'builtin'){
+      var edits = heyatStore.loadEdits();
+      edits[h.origName] = { name: newName, logoUri: editNewLogoDataUrl ? newLogo : (edits[h.origName] && edits[h.origName].logoUri) || null };
+      heyatStore.saveEdits(edits);
+    } else {
+      var custom = heyatStore.loadCustom();
+      var ci = custom.findIndex(function(c){ return c.id === h.id; });
+      if(ci !== -1){ custom[ci].name = newName; if(editNewLogoDataUrl) custom[ci].logoUri = newLogo; heyatStore.saveCustom(custom); }
+    }
+    closeEditForm();
+    renderHeyatList();
+  });
+
+  // expose switchTab for onclick
+  window.switchTab = switchTab;
+</script>
+</body>
+</html>
